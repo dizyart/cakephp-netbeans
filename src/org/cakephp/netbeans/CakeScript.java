@@ -4,12 +4,18 @@
 
 package org.cakephp.netbeans;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
+import org.cakephp.netbeans.io.RedirectInputOutput;
+import org.cakephp.netbeans.util.CakePhpUtils;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExternalProcessBuilder;
 import org.netbeans.api.extexecution.input.InputProcessor;
 import org.netbeans.api.extexecution.input.InputProcessors;
 import org.netbeans.api.extexecution.input.LineProcessor;
+import org.netbeans.modules.csl.api.UiUtils;
 import org.netbeans.modules.php.api.phpmodule.PhpModule;
 import org.netbeans.modules.php.api.phpmodule.PhpProgram;
 import org.netbeans.modules.php.api.util.FileUtils;
@@ -24,6 +30,8 @@ import org.openide.windows.InputOutput;
 public class CakeScript extends PhpProgram {
     public static final String SCRIPT_NAME = "cake"; // NOI18N
     public static final String SCRIPT_NAME_LONG = SCRIPT_NAME + ".php"; // NOI18N
+    private static final String CAKE_APP_CONFIG_DATABASE_PHP = "app/config/database.php"; // NOI18N
+    private static final String CAKE2_APP_CONFIG_DATABASE_PHP = "app/Config/database.php"; // NOI18N
 
     private static final String SCRIPT_DIRECTORY = "cake/console/"; // NOI18N
     private static final String SCRIPT_DIRECTORY_2 = "Console/"; // NOI18N cake2.x.x
@@ -95,6 +103,32 @@ public class CakeScript extends PhpProgram {
         executeLater(processBuilder, executionDescriptor, CMD_BAKE);
     }
     
+    public void initDatabaseConfig(String inputString){
+        assert phpModule != null;
+        FileObject database;
+        if(CakePhpUtils.getCakePhpVersion(phpModule, CakePhpUtils.CAKE_VERSION_MAJOR).equals("2")){ //NOI18N
+            database = phpModule.getSourceDirectory().getFileObject(CAKE2_APP_CONFIG_DATABASE_PHP);
+        }else{
+            database = phpModule.getSourceDirectory().getFileObject(CAKE_APP_CONFIG_DATABASE_PHP);
+        }
+        if(database != null){
+            // Open database.php
+            UiUtils.open(database, 0);
+            return;
+        }
+        bake(inputString);
+    }
+
+    protected void bake(String inputString, String... arg){
+        FrameworkCommandSupport commandSupport = CakePhpFrameworkProvider.getInstance().getFrameworkCommandSupport(phpModule);
+        ExternalProcessBuilder processBuilder = commandSupport.createCommand(CMD_BAKE, arg); // NOI18N
+        assert processBuilder != null;
+        InputStream inputStream = new ByteArrayInputStream(inputString.getBytes());
+	RedirectInputOutput redirect = new RedirectInputOutput(new InputStreamReader(inputStream));
+        ExecutionDescriptor descriptor = commandSupport.getDescriptor().inputOutput(redirect);
+	executeLater(processBuilder, descriptor, CMD_BAKE);
+    }
+
     public static String getHelp(PhpModule phpModule, FrameworkCommand command){
         FrameworkCommandSupport commandSupport = CakePhpFrameworkProvider.getInstance().getFrameworkCommandSupport(phpModule);
         ExternalProcessBuilder processBuilder = commandSupport.createCommand(command.getCommands(), "--help"); // NOI18N

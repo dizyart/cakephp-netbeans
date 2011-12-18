@@ -11,6 +11,7 @@ import org.cakephp.netbeans.ui.actions.CakePhpGoToActionAction;
 import org.cakephp.netbeans.ui.actions.CakePhpGoToViewAction;
 import org.cakephp.netbeans.ui.actions.CakePhpRunCommandAction;
 import org.cakephp.netbeans.ui.actions.ClearCacheAction;
+import org.cakephp.netbeans.ui.actions.DatabaseConfigurationWizardAction;
 import org.cakephp.netbeans.ui.actions.RunBakeAction;
 import org.cakephp.netbeans.util.CakePhpUtils;
 import org.netbeans.modules.php.spi.actions.GoToActionAction;
@@ -32,6 +33,7 @@ public class CakePhpActionsExtender extends PhpModuleActionsExtender {
     public List<? extends Action> getActions() {
         List<Action> list = new ArrayList<Action>();
 	list.add(RunBakeAction.getInstance());
+	list.add(DatabaseConfigurationWizardAction.getInstance());
 	list.add(ClearCacheAction.getInstance());
 	return list;
 //	    return ACTIONS;
