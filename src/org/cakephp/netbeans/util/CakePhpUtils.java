@@ -496,8 +496,8 @@ public final class CakePhpUtils {
      * @param pm
      * @param dirType
      * @param fileType
-     * @param name Call name (e.g. Plugin -> DebugKit.Toolbar, HtmlHelper ->
-     * Html, ...
+     * @param name Call name - Plugin -> DebugKit.Toolbar - HtmlHelper -> Html -
+     * View file -> Elements/sample
      * @return
      */
     public static FileObject getFile(PhpModule pm, DIR dirType, FILE fileType, String name) {
@@ -619,9 +619,13 @@ public final class CakePhpUtils {
                     fileName = name + "Component"; // NOI18N
                     break;
                 case VIEW:
+                    fileName = name;
                 default:
                     break;
             }
+        }
+        if (fileType == FILE.VIEW) {
+            return fileName + "." + FILE_VIEW_EXT; // NOI18N
         }
         return fileName + ".php"; // NOI18N
     }
