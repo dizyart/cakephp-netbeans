@@ -7,7 +7,7 @@ This plugin provides support for CakePHP.
 - 2010/07/16
 - 2012/07/28 update
 - 2012/09/08 Support for NetBeans7.3
-- 2012/09/15 added usage
+- 2012/11/05 latest update
 
 ## ENVIRONMENT
 
@@ -28,7 +28,10 @@ This plugin provides support for CakePHP.
 - install plugins action (from zip file URL)[*1]
 - template files (ctp, helper, component, behavior, shell, task)
 - create new CakePHP projects from new project option
-- code completion support [New:v0.6]
+- code completion support
+- format for CakePHP action
+- go to element file from view file
+- display and change debug level
 
 [*1] right-click in project node > CakePHP > (Run Command | Clear Cache | Install Plugins)
 
@@ -144,6 +147,46 @@ Similar to Go to view action.
 
 1. Right-click on the view file (in editor)
 2. Navigate > Go to action
+
+### Format+ Action (Format for CakePHP)
+
+This action run the following.
+
+1. Reformat (format settings : Tool > Option > Editor > Format)
+2. Remove indents of Document Block
+3. Change line separator to LF(Unix)
+
+Q. Why do you add this action?
+
+A. I add in order to follow the [CakePHP Coding Standars](http://book.cakephp.org/2.0/en/contributing/cakephp-coding-conventions.html)
+
+### Hyperlink for view element files (v0.6.9)
+
+You can go to the element file from view file.
+
+Search the following element file directories:
+
+- app(app/View/Elements, app/views/elememts)
+- core(lib/cake/View/Elements, cake/views/elements)
+
+e.g.
+
+```php
+$this->element('sample');
+```
+Hold down Ctrl key and click on 'sample'.
+
+If there is sample.ctp in the above directories, open the sample.ctp.
+Otherwise do nothing.
+
+
+### Display and Change debug level (v0.6.10)
+
+You can change debug level on popup list.
+
+When you choose the CakePHP file node, you would find the cake icon and debug level number at the lower right of the window.
+
+If you change debug level, click the icon. Then the popup is displayed. Please, select the debug level number.
 
 ## HOW TO RUN:
 
