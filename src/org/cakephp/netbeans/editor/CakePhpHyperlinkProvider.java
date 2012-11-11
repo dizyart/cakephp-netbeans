@@ -82,7 +82,7 @@ public class CakePhpHyperlinkProvider implements HyperlinkProvider {
         ts.move(offset);
         ts.moveNext();
         Token<PHPTokenId> token = ts.token();
-        target = token.toString();
+        target = token.text().toString();
         PHPTokenId id = token.id();
         int newOffset = ts.offset();
 
@@ -91,7 +91,6 @@ public class CakePhpHyperlinkProvider implements HyperlinkProvider {
         }
 
         if (id == PHPTokenId.PHP_CONSTANT_ENCAPSED_STRING) {
-            target = token.toString();
             if (target.length() > 2) {
                 target = target.substring(1, target.length() - 1);
             } else {
@@ -139,8 +138,10 @@ public class CakePhpHyperlinkProvider implements HyperlinkProvider {
         ts.movePrevious();
         ts.movePrevious();
         Token<PHPTokenId> method = ts.token();
+        String methodName = method.text().toString();
         PHPTokenId methodId = method.id();
-        if (!method.toString().equals("element") || methodId != PHPTokenId.PHP_STRING) { // NOI18N
+
+        if (!methodName.equals("element") || methodId != PHPTokenId.PHP_STRING) { // NOI18N
             return false;
         }
         return true;
