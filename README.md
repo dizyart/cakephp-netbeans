@@ -107,15 +107,17 @@ create a database, you can immediately start development in a local environment.
 Support for core components and helpers (default).
 Also support for classes in $uses, $components, $helpers.(also contain the alias)
 
-	// e.g.
-	public $uses('Comment', 'Member', 'User');
-	// $this->Comm [Ctrl + Space] => $this->Comment [Ctrl + Space]
+```php
+// e.g.
+public $uses('Comment', 'Member', 'User');
+// $this->Comm [Ctrl + Space] => $this->Comment [Ctrl + Space]
 
-	public $components('Search.Prg', 'Foo');
-	// $this->P [Ctrl + Space] => $this->Prg-> [Ctrl + Space] => display methods and fields
+public $components('Search.Prg', 'Foo');
+// $this->P [Ctrl + Space] => $this->Prg-> [Ctrl + Space] => display methods and fields
 
-	public $helpers('Session', 'Html' => array('className' => 'MyHtml'));
-	// $this->Html-> [Ctrl + Space] => display MyHtmlHelper class methods and fields
+public $helpers('Session', 'Html' => array('className' => 'MyHtml'));
+// $this->Html-> [Ctrl + Space] => display MyHtmlHelper class methods and fields
+```
 
 ### Go To View Action
 You can move from controller action to view file.
@@ -125,12 +127,14 @@ You can move from controller action to view file.
 
 e.g.
 
-	class MainController extends AppController{
-		// ... something
-		public function index() {
-			// Right-click or shortcut here
-		}
-	}
+```php
+class MainController extends AppController{
+        // ... something
+        public function index() {
+                // Right-click or shortcut here
+        }
+}
+```
 
 If you use shortcut, register with Keymap.
 
