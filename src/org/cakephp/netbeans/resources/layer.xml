@@ -251,4 +251,7 @@
             </file>
          </folder>
     </folder>
+    <folder name="org-cakephp-netbeans">
+        <file name="favicon.ico" url="favicon.ico" />
+    </folder>
 </filesystem>

@@ -7,7 +7,7 @@ This plugin provides support for CakePHP.
 - 2010/07/16
 - 2012/07/28 update
 - 2012/09/08 Support for NetBeans7.3
-- 2012/11/26 latest update
+- 2012/12/08 latest update
 
 ## ENVIRONMENT
 
@@ -32,7 +32,8 @@ This plugin provides support for CakePHP.
 - format for CakePHP action
 - go to element file from view file
 - display and change debug level
-- multiple app directories support [**beta**]
+- multiple app directories support
+- verify CakePHP action [v0.6.15]
 
 [*1] right-click in project node > CakePHP > (Run Command | Clear Cache | Install Plugins)
 
@@ -255,6 +256,12 @@ You can change debug level on popup list.
 When you choose the CakePHP file node, you would find the cake icon and debug level number at the lower right of the window.
 
 If you change debug level, click the icon. Then the popup is displayed. Please, select the debug level number.
+
+### Verify CakePHP Action (v0.6.15)
+
+Verify default asset names. (e.g. css/cake.generic.css, img/cake.icon.png, ...)
+
+Verify whether favicon.ico is changed.
 
 ## HOW TO RUN:
 
