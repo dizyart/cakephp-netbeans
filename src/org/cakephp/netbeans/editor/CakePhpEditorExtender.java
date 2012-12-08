@@ -352,10 +352,7 @@ public class CakePhpEditorExtender extends EditorExtender {
                         int len = split.length;
                         switch (len) {
                             case 1:
-                                FileObject component = module.getComponentDirectory(DIR_TYPE.APP);
-                                if (component != null) {
-                                    object = component.getFileObject(elementName + ".php"); // NOI18N
-                                }
+                                object = module.getComponentFile(DIR_TYPE.APP, elementName);
                                 break;
                             case 2:
                                 String pluginName = split[0];
@@ -392,9 +389,9 @@ public class CakePhpEditorExtender extends EditorExtender {
                             case 2:
                                 String pluginName = split[0];
                                 String helperName = split[1];
-                                object = module.getHelperFile(DIR_TYPE.APP_PLUGIN, elementName, pluginName);
+                                object = module.getHelperFile(DIR_TYPE.APP_PLUGIN, helperName, pluginName);
                                 if (object == null) {
-                                    object = module.getHelperFile(DIR_TYPE.PLUGIN, elementName, pluginName);
+                                    object = module.getHelperFile(DIR_TYPE.PLUGIN, helperName, pluginName);
                                 }
                                 elementName = helperName;
                                 break;
@@ -513,9 +510,9 @@ public class CakePhpEditorExtender extends EditorExtender {
                         case 2:
                             String pluginName = split[0];
                             String componentName = split[1];
-                            object = module.getComponentFile(DIR_TYPE.APP_PLUGIN, elementName, pluginName);
+                            object = module.getComponentFile(DIR_TYPE.APP_PLUGIN, componentName, pluginName);
                             if (object == null) {
-                                object = module.getComponentFile(DIR_TYPE.PLUGIN, elementName, pluginName);
+                                object = module.getComponentFile(DIR_TYPE.PLUGIN, componentName, pluginName);
                             }
                             elementName = componentName;
                             break;
@@ -613,9 +610,9 @@ public class CakePhpEditorExtender extends EditorExtender {
                         case 2:
                             String pluginName = split[0];
                             String helperName = split[1];
-                            object = module.getHelperFile(DIR_TYPE.APP_PLUGIN, elementName, pluginName);
+                            object = module.getHelperFile(DIR_TYPE.APP_PLUGIN, helperName, pluginName);
                             if (object == null) {
-                                object = module.getHelperFile(DIR_TYPE.PLUGIN, elementName, pluginName);
+                                object = module.getHelperFile(DIR_TYPE.PLUGIN, helperName, pluginName);
                             }
                             elementName = helperName;
                             break;
