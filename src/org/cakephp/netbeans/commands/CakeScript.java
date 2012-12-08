@@ -53,7 +53,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.cakephp.netbeans.CakePhpFrameworkProvider;
+import org.cakephp.netbeans.module.CakePhpModule;
+import org.cakephp.netbeans.preferences.CakePreferences;
 import org.cakephp.netbeans.util.CakeVersion;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.input.InputProcessor;
@@ -76,39 +77,31 @@ import org.xml.sax.SAXException;
 public final class CakeScript {
 
     static final Logger LOGGER = Logger.getLogger(CakeScript.class.getName());
-
     public static final String OPTIONS_SUB_PATH = "CakePhp"; // NOI18N
-
     public static final String SCRIPT_NAME = "cake"; // NOI18N
     public static final String SCRIPT_NAME_LONG = SCRIPT_NAME + ".php"; // NOI18N
-    private static final String SCRIPT_DIRECTORY = "cake/console/"; // NOI18N
-    private static final String SCRIPT_DIRECTORY_2 = "Console/"; // NOI18N cake2.x.x
-
     private static final String HELP_COMMAND = "--help"; // NOI18N
     private static final String BAKE_COMMAND = "bake"; // NOI18N
     private static final String LIST_COMMAND = "command_list"; // NOI18N
     private static final List<String> LIST_XML_COMMAND = Arrays.asList(LIST_COMMAND, "--xml"); // NOI18N
-
     // XXX any default params?
     private static final List<String> DEFAULT_PARAMS = Collections.emptyList();
-
     private static final String CORE_SHELLS_DIRECTORY = "cake/console/libs"; // NOI18N
     private static final String VENDORS_SHELLS_DIRECTORY = "vendors/shells"; // NOI18N
-    private static final String APP_VENDORS_SHELLS_DIRECTORY = "app/vendors/shells"; // NOI18N
-    private static final String[] SHELLS = {CORE_SHELLS_DIRECTORY, VENDORS_SHELLS_DIRECTORY, APP_VENDORS_SHELLS_DIRECTORY};
-
-
     private final String cakePath;
-
+    private List<String> appPrams = new ArrayList<String>();
 
     private CakeScript(String cakePath) {
         this.cakePath = cakePath;
     }
 
     /**
-     * Get the project specific, <b>valid only</b> Cake script. If not found, {@code null} is returned.
+     * Get the project specific, <b>valid only</b> Cake script. If not found,
+     * {@code null} is returned.
+     *
      * @param phpModule PHP module for which Cake script is taken
-     * @param warn <code>true</code> if user is warned when the Cake script is not valid
+     * @param warn <code>true</code> if user is warned when the Cake script is
+     * not valid
      * @return Cake console script or {@code null} if the script is not valid
      */
     @NbBundle.Messages({
@@ -135,13 +128,13 @@ public final class CakeScript {
     }
 
     private static FileObject getPath(PhpModule phpModule) {
-        FileObject sourceDirectory = CakePhpFrameworkProvider.getCakePhpDirectory(phpModule);
-        // locate
-        FileObject cake = sourceDirectory.getFileObject(SCRIPT_DIRECTORY + SCRIPT_NAME_LONG);
-        if (cake != null) {
-            return cake;
+        CakePhpModule module = CakePhpModule.forPhpModule(phpModule);
+        FileObject consoleDirectory = module.getConsoleDirectory(CakePhpModule.DIR_TYPE.APP);
+        if (consoleDirectory == null) {
+            LOGGER.log(Level.WARNING, "Not found " + SCRIPT_NAME);
+            return null;
         }
-        return sourceDirectory.getFileObject("app/" + SCRIPT_DIRECTORY_2 + SCRIPT_NAME_LONG); // NOI18N
+        return consoleDirectory.getFileObject(SCRIPT_NAME_LONG);
     }
 
     @NbBundle.Messages("CakeScript.script.label=Cake script")
@@ -154,6 +147,11 @@ public final class CakeScript {
     }
 
     public void runCommand(PhpModule phpModule, List<String> parameters, Runnable postExecution) {
+        if (!CakePreferences.getAppName(phpModule).equals("app")) { // NOI18N
+            FileObject app = CakePhpModule.forPhpModule(phpModule).getDirectory(CakePhpModule.DIR_TYPE.APP);
+            appPrams.add("-app"); // NOI18N
+            appPrams.add(app.getPath());
+        }
         createPhpExecutable(phpModule)
                 .displayName(getDisplayName(phpModule, parameters.get(0)))
                 .additionalParameters(getAllParams(parameters))
@@ -208,12 +206,13 @@ public final class CakeScript {
 
     private PhpExecutable createPhpExecutable(PhpModule phpModule) {
         return new PhpExecutable(cakePath)
-                .workDir(FileUtil.toFile(CakePhpFrameworkProvider.getCakePhpDirectory(phpModule)));
+                .workDir(FileUtil.toFile(CakePhpModule.getCakePhpDirectory(phpModule)));
     }
 
     private List<String> getAllParams(List<String> params) {
         List<String> allParams = new ArrayList<String>();
         allParams.addAll(DEFAULT_PARAMS);
+        allParams.addAll(appPrams);
         allParams.addAll(params);
         return allParams;
     }
@@ -279,7 +278,7 @@ public final class CakeScript {
         for (CakeCommandItem item : commandsItem) {
             if (!redirectToFile(phpModule, tmpFile, Arrays.asList(item.getCommand(), HELP_COMMAND, "xml"))) { // NOI18N
                 commands.add(new CakePhpCommand(phpModule,
-                    item.getCommand(), item.getDescription(), item.getDisplayName()));
+                        item.getCommand(), item.getDescription(), item.getDisplayName()));
                 continue;
             }
             List<CakeCommandItem> mainCommandsItem = new ArrayList<CakeCommandItem>();
@@ -288,7 +287,7 @@ public final class CakeScript {
             } catch (SAXException ex) {
                 LOGGER.log(Level.WARNING, "Xml file Error:{0}", ex.getMessage());
                 commands.add(new CakePhpCommand(phpModule,
-                    item.getCommand(), item.getDescription(), item.getDisplayName()));
+                        item.getCommand(), item.getDescription(), item.getDisplayName()));
                 continue;
             }
             if (mainCommandsItem.isEmpty()) {
@@ -303,7 +302,7 @@ public final class CakeScript {
                 mainCommand = provider + "." + mainCommand;
             }
             commands.add(new CakePhpCommand(phpModule,
-                mainCommand, "[" + provider + "] " + main.getDescription(), main.getDisplayName())); // NOI18N
+                    mainCommand, "[" + provider + "] " + main.getDescription(), main.getDisplayName())); // NOI18N
 
             // add subcommands
             List<CakeCommandItem> subcommands = main.getSubcommands();
@@ -313,7 +312,7 @@ public final class CakeScript {
             for (CakeCommandItem subcommand : subcommands) {
                 String[] command = {mainCommand, subcommand.getCommand()};
                 commands.add(new CakePhpCommand(phpModule,
-                    command, "[" + provider + "] " + subcommand.getDescription(), main.getCommand() + " " + subcommand.getDisplayName())); // NOI18N
+                        command, "[" + provider + "] " + subcommand.getDescription(), main.getCommand() + " " + subcommand.getDisplayName())); // NOI18N
             }
         }
         tmpFile.delete();
@@ -348,8 +347,10 @@ public final class CakeScript {
         // cakephp1.3+
         List<FrameworkCommand> commands = new ArrayList<FrameworkCommand>();
         List<FileObject> shellDirs = new ArrayList<FileObject>();
-        for (String shell : SHELLS) {
-            FileObject shellFileObject = CakePhpFrameworkProvider.getCakePhpDirectory(phpModule).getFileObject(shell);
+        String[] shells = {CORE_SHELLS_DIRECTORY, VENDORS_SHELLS_DIRECTORY, CakePreferences.getAppName(phpModule) + "/" + VENDORS_SHELLS_DIRECTORY};
+
+        for (String shell : shells) {
+            FileObject shellFileObject = CakePhpModule.getCakePhpDirectory(phpModule).getFileObject(shell);
             if (shellFileObject != null) {
                 shellDirs.add(shellFileObject);
             }
@@ -376,10 +377,11 @@ public final class CakeScript {
 
     private String getShellsPlace(PhpModule phpModule, FileObject shellDir) {
         String place = ""; // NOI18N
-        FileObject source = CakePhpFrameworkProvider.getCakePhpDirectory(phpModule);
+        String app = CakePreferences.getAppName(phpModule);
+        FileObject source = CakePhpModule.getCakePhpDirectory(phpModule);
         if (source.getFileObject(CORE_SHELLS_DIRECTORY) == shellDir) {
             place = "CORE"; // NOI18N
-        } else if (source.getFileObject(APP_VENDORS_SHELLS_DIRECTORY) == shellDir) {
+        } else if (source.getFileObject(app + "/" + VENDORS_SHELLS_DIRECTORY) == shellDir) {
             place = "APP VENDOR"; // NOI18N
         } else if (source.getFileObject(VENDORS_SHELLS_DIRECTORY) == shellDir) {
             place = "VENDOR"; // NOI18N
@@ -388,7 +390,6 @@ public final class CakeScript {
     }
 
     //~ Inner classes
-
     private static class HelpLineProcessor implements LineProcessor {
 
         private StringBuilder sb = new StringBuilder();
